@@ -1,0 +1,87 @@
+/*
+ * Shackle Reservation Matching Service
+ * Match reservations with users based on guest details and other information.
+ */
+syntax = "proto3";
+
+import "reservation_service.proto";
+
+package shackle.reservation;
+
+option java_package = "shackle.reservation.grpc";
+
+/*
+ * This is the single RPC that you need to implement. It has one method for matching
+ * a reservation.
+ */
+service ReservationMatchingService {
+  rpc MatchReservation(MatchReservationsRequest) returns (MatchReservationResponse);
+}
+
+/*
+ * The request message. The guest details need not be completely populated;
+ * all fields are optional.
+ */
+message MatchReservationsRequest {
+  /* All *known* details about the guest. Any number of fields could be absent. */
+  GuestDetails guest_details = 1;
+
+  /* The arrival date of the guest. Optional. */
+  LocalDate arrival_date = 2;
+
+  /* A confirmation code that the guest may have received. Guests are not aware of the
+   * type of confirmation code they receive.
+   */
+  string confirmation_code = 3;
+}
+
+message MatchReservationResponse {
+  enum Status {
+    // When a new code is added which a client doesn't know, protobuf will default to this value.
+    // Use this to check whether a client must be updated.
+    STATUS_UNKNOWN = 0;
+
+    // Use this status to indicate that no matching reservation were found for the request.
+    STATUS_NO_MATCH = 1;
+    
+    // Use this status to indicate that potential matching reservations exist, but more
+    // information is needed to verify the user claiming the reservation.
+    STATUS_NEED_MORE_INFO = 2;
+
+    // Use this status to indicate that matching reservations were found and will be
+    // returned.
+    STATUS_FOUND = 3;
+  }
+
+  // The status of the response, indicating whether a match exists, or might exist.
+  Status status = 1;
+
+  // The result of the operation, if any.
+  oneof result {
+    // Populate this, if there are resulting matches.
+    MatchResults match_results = 2;
+
+    // Populate this if more information is needed.
+    MissingInformation missing_information = 3;
+  }
+}
+
+message MatchResults {
+  // Number of results
+  int32 count = 1;
+
+  /* 
+   * The matching reservations
+   * [matthijs] Would argue that it could only be a single reservation if we require 
+   * one of the external id's. Gives a bit more flexibility to keep it like this
+   */
+  repeated Reservation reservations = 2;
+}
+
+message MissingInformation {
+  // Number of additional fields requested
+  int32 count = 1;
+
+  // Names of additional fields that should be populated
+  repeated string field_name = 2;
+}
