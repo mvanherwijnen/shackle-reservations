@@ -25,5 +25,6 @@ This means we ignore the other fields, as they are not as 'identifying'.
 * Considered to add a configuration solution which could contain configs for dev/stg/prod
 * The connection to the ReservationStreamServer can be a bit more resilient against network issues
 * Matching can be done a bit less rigorous to improve easu-of-use, e.g. case insensitive email matching and matching on canonical phone numbers
+* A DockerFile with a multi-stage build would have been nice to add
 
 

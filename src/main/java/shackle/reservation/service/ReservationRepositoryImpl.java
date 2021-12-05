@@ -41,7 +41,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
   public ReservationRepositoryImpl(@Named("reservation-stream") Channel channel) {
     reservations = new ArrayList<Reservation>();
     stub = ReservationServiceGrpc.newStub(channel);
-    stub.streamReservations(Empty.newBuilder().build(), new StreamObserver<Reservation>() {
+    stub.withWaitForReady().streamReservations(Empty.newBuilder().build(), new StreamObserver<Reservation>() {
 
       @Override
       public void onNext(Reservation value) {
