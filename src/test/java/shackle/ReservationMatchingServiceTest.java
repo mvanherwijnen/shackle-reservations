@@ -132,6 +132,7 @@ public class ReservationMatchingServiceTest {
 
     assertEquals(Status.STATUS_NEED_MORE_INFO, response.getStatus());
     assertTrue(response.getMissingInformation().getFieldNameList().contains("confirmation_code"));
+    assertEquals(1, response.getMissingInformation().getCount());
   }
 
   @Test
@@ -151,6 +152,7 @@ public class ReservationMatchingServiceTest {
     assertTrue(list.contains("last_name"));
     assertTrue(list.contains("email"));
     assertTrue(list.contains("phone_number"));
+    assertEquals(4, response.getMissingInformation().getCount());
   }
 
   @Test
@@ -173,6 +175,7 @@ public class ReservationMatchingServiceTest {
             .build());
 
     assertEquals(Status.STATUS_FOUND, response.getStatus());
+    assertEquals(1, response.getMatchResults().getCount());
 
     response = matchingServiceStub.matchReservation(MatchReservationsRequest.newBuilder()
         .setConfirmationCode("booking-number")
