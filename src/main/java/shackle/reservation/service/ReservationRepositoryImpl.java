@@ -7,6 +7,7 @@ import shackle.reservation.grpc.ReservationServiceOuterClass.Empty;
 import shackle.reservation.grpc.ReservationServiceOuterClass.Reservation;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -21,14 +22,15 @@ import io.grpc.stub.StreamObserver;
 import org.apache.logging.log4j.LogManager;
 
 /**
- * This repository opens a reservation stream upon initialization. The Channel is injected.
- * It implements the findByMatchRequest by exact string matching on phone number, email, 
- * names or confirmation code. Other fields in the matching request are ignored since they 
- * are too generic.
+ * This repository opens a reservation stream upon initialization. The Channel
+ * is injected. It implements the findByMatchRequest by exact string matching on
+ * phone number, email, names or confirmation code. Other fields in the matching
+ * request are ignored since they are too generic.
  * 
  * Possible improvements:
  * - reconnecting to server upon network problems
- * - make matching a bit more forgiving, e.g. case insensitive email matching and mathcing on canonical phone numbers
+ * - make matching a bit more forgiving, e.g. case insensitive email matching
+ * and mathcing on canonical phone numbers
  */
 public class ReservationRepositoryImpl implements ReservationRepository {
   private static final Logger logger = LogManager.getLogger(ReservationRepositoryImpl.class);
@@ -39,7 +41,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
   @Inject
   public ReservationRepositoryImpl(@Named("reservation-stream") Channel channel) {
-    reservations = new ArrayList<Reservation>();
+    reservations = Collections.synchronizedList(new ArrayList<Reservation>());
     stub = ReservationServiceGrpc.newStub(channel);
     stub.withWaitForReady().streamReservations(Empty.newBuilder().build(), new StreamObserver<Reservation>() {
 
