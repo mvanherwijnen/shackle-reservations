@@ -21,20 +21,26 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 /**
- * This matching service fetches reservations from the reservation repository. 
+ * This matching service fetches reservations from the reservation repository.
  * These reservations are checked against two predicates:
  * - guestDetailsPredicate
  * - confirmationCodePredicate
  *
- * The guestDetailsPredicate checks if the email, phone number or the names match.
- * The confirmationCodePredicate checks if the provided confirmation code matches one of the external id's
+ * The guestDetailsPredicate checks if the email, phone number or the names
+ * match.
+ * The confirmationCodePredicate checks if the provided confirmation code
+ * matches one of the external id's
  * 
  * If both are true, we have return a match response with those reservations
- * If one of them is true, we return a match response with missing fields of the false predicates, iff those fields were not already provided, otherwise no matches
- * If we did not get reservations from the repository, we return a no match response
+ * If one of them is true, we return a match response with missing fields of the
+ * false predicates, iff those fields were not already provided, otherwise no
+ * matches
+ * If we did not get reservations from the repository, we return a no match
+ * response
  * 
  * Possible improvements:
- * - make matching a bit more forgiving, e.g. case insensitive email matching and mathcing on canonical phone numbers
+ * - make matching a bit more forgiving, e.g. case insensitive email matching
+ * and mathcing on canonical phone numbers
  */
 public class MatchingServiceImpl extends ReservationMatchingServiceImplBase {
   private static final Logger logger = LogManager.getLogger(MatchingServiceImpl.class);
@@ -143,7 +149,8 @@ public class MatchingServiceImpl extends ReservationMatchingServiceImplBase {
     return MatchReservationResponse.newBuilder()
         .setStatus(Status.STATUS_NEED_MORE_INFO)
         .setMissingInformation(MissingInformation.newBuilder()
-            .addAllFieldName(missingFields))
+            .addAllFieldName(missingFields)
+            .setCount(missingFields.size()))
         .build();
   }
 
@@ -151,7 +158,8 @@ public class MatchingServiceImpl extends ReservationMatchingServiceImplBase {
     return MatchReservationResponse.newBuilder()
         .setStatus(Status.STATUS_FOUND)
         .setMatchResults(MatchResults.newBuilder()
-            .addAllReservations(reservations))
+            .addAllReservations(reservations)
+            .setCount(reservations.size()))
         .build();
   }
 
